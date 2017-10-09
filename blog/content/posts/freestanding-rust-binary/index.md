@@ -108,7 +108,7 @@ After installing a nightly Rust compiler, you can enable the unstable `lang_item
 
 ### Implementing the Language Items
 
-To create a `no_std` binary, we have to implement the `panic_fmt` and the `eh_personality` language items. The `panic_fmt` items specifies a function that should be invoked when a panic occurs. This function should format an error message (hence the `_fmt` suffix) and then invoke the panic routine. In our case, there is not much we can do, since we can neither print anything nor do we a panic routine. So we just loop indefinitely:
+To create a `no_std` binary, we have to implement the `panic_fmt` and the `eh_personality` language items. The `panic_fmt` items specifies a function that should be invoked when a panic occurs. This function should format an error message (hence the `_fmt` suffix) and then invoke the panic routine. In our case, there is not much we can do, since we can neither print anything nor do we have a panic routine. So we just loop indefinitely:
 
 ```rust
 #![feature(lang_items)]
@@ -243,9 +243,7 @@ HAS_SYMS, DYNAMIC, D_PAGED
 start address 0x0000000000000000
 ```
 
-The start address should point to the entry point, but it is zero. So what's going wrong here?
-
-To understand what's happening, we have to look at the three layers of entry points again:
+The start address should point to the entry point, but it is zero. So what's going wrong here? To understand what's happening, we have to look at the three layers of entry points again:
 
 - We saw above that the `main` function is not the real entry point of a Rust binary. In fact, the compiler [mangles its name][mangling] to something like `_ZN3blog_os4main17hb173fedf945531caE`.
 - The `start` language item (which can be overridden by the `start` attribute), defines the Rust-level entry point and normally points to the Rust runtime. The compiler generates a C-compatible, unmangled `main` function for this entry point.
@@ -270,6 +268,8 @@ It's important that we disable the [name mangling][mangling] through the `no_man
 
 The `!` return type means that the function is diverging, i.e. not allowed to ever return. This is required because the entry point is not called by any function, but invoked directly by the operating system or bootloader. So instead of returning, the entry point should e.g. invoke the [`exit` system call] of the operating system. In our case, shutting down the machine could be a reasonable action, since there's nothing left to do if a freestanding binary returns. For now, we fulfil the requirement by looping endlessly.
 
+[`exit` system call]: https://en.wikipedia.org/wiki/Exit_(system_call)
+
 If we build our crate now (by running `cargo rustc -- -Z pre-link-arg=-nostartfiles`), the resulting binary has a valid entry point and contains code:
 
 ```
@@ -290,7 +290,9 @@ Disassembly of section .text:
  346:	eb fe                	jmp    346 <_start+0x6>
 ```
 
-Our `_start` function is just an endless loop, so it only contains very few instructions. The loop is formed by the `jmp` instruction at address `346`, which just jumps to itself forever. The other instructions are just there because the build is unoptimized. If we compile with optimizations using the `--release` flag (`cargo rustc --release -- -Z pre-link-arg=-nostartfiles`), only one `jmp` instruction is left:
+The `-fd` argument to `objdump` is a combination of the short forms of the `--file-headers` (`-f`) and `--disassemble` (`-d`) arguments we saw above.
+
+We see that our binary contains very few instructions, which is expected since our `_start` function is just an endless loop. The `jmp` instruction at address `346`, which jumps to itself forever, is the translation of this endless loop. The other instructions are just there because the build is unoptimized. If we compile with optimizations using the `--release` flag (`cargo rustc --release -- -Z pre-link-arg=-nostartfiles`), only one `jmp` instruction is left:
 
 ```
 > objdump -d target/release/blog_os_test
@@ -321,7 +323,7 @@ pub fn _start() -> ! {
 // [panic_fmt language item]
 ```
 
-# Summary
+## Summary
 
 A minimal freestanding Rust binary looks like this:
 
