@@ -373,3 +373,11 @@ It can be compiled with:
 ```
 cargo rustc -- -Z pre-link-arg=-nostartfiles
 ```
+
+Note that this is just a minimal example of a freestanding Rust binary. This binary expects various things, for example that a stack is initialized when the `_start` function is called. **So for any real use of such a binary, more steps are required**.
+
+## What's next?
+
+The [next post] build upon our minimal freestanding binary by explaining the steps needed for creating a minimal operating system kernel. It explains how to configure the kernel for the target system, how to start it using a bootloader, and how to print something to the screen.
+
+[next post]: TODO
