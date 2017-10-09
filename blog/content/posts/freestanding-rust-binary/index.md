@@ -13,6 +13,9 @@ This post describes how to create a Rust executable that does not link the stand
 
 TODO github, issues, comments, etc
 
+## Introduction
+This post describes the steps necessary to get a freestanding Rust binary and explains why the steps are needed. **If you're just interested in a minimal example, you can [jump to the summary](#summary)**.
+
 This tutorial doesn't require that you're familiar with Rust, but it doesn't explain all the basics. For an introduction to Rust and an installation guide take a look at the [official Rust book].
 
 [official Rust book]: https://doc.rust-lang.org/stable/book/second-edition/
