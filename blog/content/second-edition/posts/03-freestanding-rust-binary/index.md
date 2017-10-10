@@ -1,8 +1,9 @@
 +++
 title = "A Freestanding Rust Binary"
-order = 0
+order = 3
 path = "freestanding-rust-binary"
 date = "0000-01-01"
+template = "second-edition/page.html"
 +++
 
 This post describes how to create a Rust executable that does not link the standard library. This makes it possible to run Rust code on the [bare metal] without an underlying operating system.
