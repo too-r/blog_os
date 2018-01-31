@@ -234,6 +234,8 @@ With this command, our crate builds again. However, it won't work in its current
 
 ## Setting the Entry Point
 
+TODO: use elfkit instead of objdump? https://github.com/aep/elfkit
+
 Let's take a look at the compiled binary using the [`objdump` tool]:
 
 [`objdump` tool]: http://sourceware.org/binutils/docs/binutils/objdump.html
