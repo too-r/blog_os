@@ -15,11 +15,24 @@ This post describes how to create a Rust executable that does not link the stand
 TODO github, issues, comments, etc
 
 ## Introduction
-This post describes the steps necessary to get a freestanding Rust binary and explains why the steps are needed. **If you're just interested in a minimal example, you can [jump to the summary](#summary)**.
+To write an operating system kernel, we need code that does not depend on any operating system features. This means that we can't use threads, files, heap memory, the network, random numbers, standard output, or any other features requiring OS abstractions or specific hardware. Which makes sense, since we're trying to write our own OS and our own drivers.
 
-This tutorial doesn't require that you're familiar with Rust, but it doesn't explain all the basics. For an introduction to Rust and an installation guide take a look at the [official Rust book].
+This means that we can't use most of the [Rust standard library], but there are a lot of Rust features that we _can_ use. For example, we can use [iterators], [closures], [pattern matching], [option] and [result], [string formatting], and of course the [ownership system]. These features make it possible to write a kernel in a very expressive, high level way without worrying about [undefined behavior] or [memory safety].
 
-[official Rust book]: https://doc.rust-lang.org/stable/book/second-edition/
+[option]: https://doc.rust-lang.org/core/option/
+[result]:https://doc.rust-lang.org/core/result/
+[Rust standard library]: https://doc.rust-lang.org/std/
+[iterators]: https://doc.rust-lang.org/book/second-edition/ch13-02-iterators.html
+[closures]: https://doc.rust-lang.org/book/second-edition/ch13-01-closures.html
+[pattern matching]: https://doc.rust-lang.org/book/second-edition/ch06-00-enums.html
+[string formatting]: https://doc.rust-lang.org/core/macro.write.html
+[ownership system]: https://doc.rust-lang.org/book/second-edition/ch04-00-understanding-ownership.html
+[undefined behavior]: https://www.nayuki.io/page/undefined-behavior-in-c-and-cplusplus-programs
+[memory safety]: https://tonyarcieri.com/it-s-time-for-a-memory-safety-intervention
+
+In order to create an OS kernel in Rust, we need to create an executable that can be run without an underlying operating system. Such an executable is often called a “freestanding” or “bare-metal” executable.
+
+This post describes the necessary steps to get a freestanding Rust binary and explains why the steps are needed. If you're just interested in a minimal example, you can **[jump to the summary](#summary)**.
 
 ## Disabling the Standard Library
 By default, all Rust crates link the [standard library], which dependends on the operating system for features such as threads, files, or networking. It also depends on the C standard library `libc`, which closely interacts with OS services. Since our plan is to write an operating system, we can not use any OS-dependent libraries. So we have to disable the automatic inclusion of the standard library through the [`no_std` attribute].
