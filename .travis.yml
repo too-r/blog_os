@@ -5,10 +5,15 @@ rust:
 
 cache: cargo
 
+os:
+  - linux
+  - osx
+
 before_script:
   - rustup component add rust-src
   - (test -x $HOME/.cargo/bin/cargo-install-update || cargo install cargo-update)
   - (test -x $HOME/.cargo/bin/xargo || cargo install xargo)
+  - (test -x $HOME/.cargo/bin/bootimage || cargo install bootimage)
   - cargo install-update -a
 
 sudo: false
@@ -18,10 +23,5 @@ notifications:
         on_success: never
         on_failure: change
 
-addons:
-  apt:
-    packages:
-      - nasm
-
 script:
-  - make
+  - bootimage --target x86_64-blog_os
