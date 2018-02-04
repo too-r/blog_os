@@ -1,13 +1,14 @@
 language: rust
 
+sudo: false
+
+notifications:
+    email:
+        on_success: never
+        on_failure: change
+
 rust:
     - nightly
-
-cache:
-  directories:
-    - $HOME/.cargo
-    - $HOME/.xargo
-    - $TRAVIS_BUILD_DIR/target
 
 os:
   - linux
@@ -19,6 +20,12 @@ addons:
       - llvm-toolchain-trusty-5.0
     packages:
       - lld-5.0
+
+cache:
+  directories:
+    - $HOME/.cargo
+    - $HOME/.xargo
+    - $TRAVIS_BUILD_DIR/target
 
 before_install:
   - |
@@ -36,14 +43,6 @@ before_script:
   - (test -x $HOME/.cargo/bin/xargo || cargo install xargo)
   - (test -x $HOME/.cargo/bin/bootimage || cargo install bootimage)
   - cargo install-update -a
-
-
-sudo: false
-
-notifications:
-    email:
-        on_success: never
-        on_failure: change
 
 script:
   - bootimage --target x86_64-blog_os
